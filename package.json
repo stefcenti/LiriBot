@@ -1,0 +1,23 @@
+{
+  "name": "liribot",
+  "version": "1.0.0",
+  "description": "Language Interpretation and Recognition Interface",
+  "main": "liri.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stefcenti/LiriBot.git"
+  },
+  "keywords": [
+    "liri",
+    "liribot"
+  ],
+  "author": "Stefanie Centi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/stefcenti/LiriBot/issues"
+  },
+  "homepage": "https://github.com/stefcenti/LiriBot#readme"
+}
