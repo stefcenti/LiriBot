@@ -79,7 +79,7 @@ function liriBot() {
 			function (error, response, body) {
 				if (!error && 
 					response.statusCode == 200 &&
-					JSON.parse(body)["Response"] == "True") {					console.log(body);
+					JSON.parse(body)["Response"] == "True") {
 					console.log("Title: " + JSON.parse(body)["Title"]);
 					console.log("Year: " + JSON.parse(body)["Year"]);
 					console.log("IMDB Rating: " + JSON.parse(body)["imdbRating"]);
@@ -90,11 +90,13 @@ function liriBot() {
 					console.log("Rotten Tomatoes Rating: " + JSON.parse(body)["tomatoRating"]);
 					console.log("Rotton Tomatoes URL: " + JSON.parse(body)["tomatoURL"]);
 				}
-				else {
+				else if (!error && response.statusCode == 200) {
 					console.log(JSON.parse(body)["Error"]);
 				}
+				else {
+					console.log(error);
+				}
 			});
-	
 	}
 
 	function doIt(){
