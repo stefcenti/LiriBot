@@ -3,44 +3,31 @@ function liriBot() {
 
 	var fs = require('fs');
 
-	if (process.argv.length != 3) {
-		usage();
-	}
 
 	switch(process.argv[2]){
 		case "my-tweets":
+			if (process.argv.length != 3) {
+				usage();
+				break;
+			}
 			myTweets();
 			break;
 		case "spotify-this-song":
-			spotifyThis();
+			spotifyThis(process.argv.splice(3, process.argv.length - 3));
 			break;
 		case "movie-this":
-			movieThis();
+			movieThis(process.argv.splice(3, process.argv.length - 3));
 			break;
 		case "do-what-it-says":
+			if (process.argv.length != 3) {
+				usage();
+				break;
+			}
 			doIt();
 			break;
 		default:
 			usage();
 	}
-
-// Running the readFile module that's inside of fs.
-// Stores the read information into the variable "data"
-/*
-fs.readFile("keys.js", "utf8", function(err,data){
-	    
-	// Break the string down by comma separation and store the contents into the output array.
-	var output = data.split(',');
-
-	// Loop Through the newly created output array 
-	for (var i=0; i<output.length; i++){
-
-		// Print each element (item) of the array/ 
-		console.log(output[i]);
-	}
-
-});
-*/
 
 	function myTweets(){
 		var Twitter = require('twitter');
@@ -77,8 +64,37 @@ fs.readFile("keys.js", "utf8", function(err,data){
 
 	}
 
-	function movieThis(){
+	// This function takes an array of words making the movie name
+	function movieThis(movieName){
 
+		var request = require('request');
+
+		// Run a request to the OMDB API with the movie specified
+		// If no movie is specified use Mr. Nobody.  Since each word
+		// of the movie name is separated in the movieName array, it
+		// needs to be joined together with "+" between each word.
+		var movie = movieName.length ? movieName.join('+') : "Mr.+Nobody";
+
+		request('http://www.omdbapi.com/?t=' + movie + '&y=&plot=short&tomatoes=true&r=json', 
+			function (error, response, body) {
+				if (!error && 
+					response.statusCode == 200 &&
+					JSON.parse(body)["Response"] == "True") {					console.log(body);
+					console.log("Title: " + JSON.parse(body)["Title"]);
+					console.log("Year: " + JSON.parse(body)["Year"]);
+					console.log("IMDB Rating: " + JSON.parse(body)["imdbRating"]);
+					console.log("Country: " + JSON.parse(body)["Country"]);
+					console.log("Language: " + JSON.parse(body)["Language"]);
+					console.log("Plot: " + JSON.parse(body)["Plot"]);
+					console.log("Actors: " + JSON.parse(body)["Actors"]);
+					console.log("Rotten Tomatoes Rating: " + JSON.parse(body)["tomatoRating"]);
+					console.log("Rotton Tomatoes URL: " + JSON.parse(body)["tomatoURL"]);
+				}
+				else {
+					console.log(JSON.parse(body)["Error"]);
+				}
+			});
+	
 	}
 
 	function doIt(){
@@ -87,7 +103,11 @@ fs.readFile("keys.js", "utf8", function(err,data){
 
 	function usage(){
 		console.log("Usage: node liri.js <command>");
-		console.log("Where: command is either my-tweets, spotify-this-song, movie-this or do-what-it-says");
+		console.log("Where: command is one of the following:");
+		console.log("    my-tweets");
+		console.log("    spotify-this-song <song name here>");
+		console.log("    movie-this <movie name here>");
+		console.log("    do-what-it-says");
 	}
 }
 
