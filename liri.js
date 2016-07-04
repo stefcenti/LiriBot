@@ -60,9 +60,46 @@ function liriBot() {
 		});
 	}
 
-	function spotifyThis(){
+	function spotifyThis(songName){
 
-	}
+        var spotify = require('spotify');
+        var printf = require('printf');
+
+        var song = songName.length ? songName.join('+'): "Whats+my+age+again";
+
+        spotify.search({ type: 'track', query: song }, function(err, data) {
+			if ( err ) {
+				console.log('Error occurred: ' + err);
+				return;
+			}
+
+			//console.log(JSON.stringify(data.tracks, null, 2);
+
+			var items = data.tracks.items;
+			var col1 = "";
+			var col2 = "";
+			var col3 = "";
+			var col4 = "";
+			var col5 = "";
+
+			console.log("\tArtist\t\t\tSong Name\t\t\t\t\tSpotify Link\t\t\tAlbum\t\t\t\tTrack Number");
+
+   			 for (var i=0; i<items.length; i++) {
+   			 	col1 = JSON.stringify(items[i].artists[0].name, null, 2);
+   			 	col2 = JSON.stringify(items[i].name, null, 2);
+				col3 = JSON.stringify(items[i].uri, null, 2);
+				col4 = JSON.stringify(items[i].album.name, null, 2);
+				col5 = JSON.stringify(items[i].track_number, null, 2);
+
+				console.log(printf("%-25s %-40s %-40s %-30s\t    %-3d", 
+					(col1.replace(/"/g, ' ')).substr(0,25), 
+					(col2.replace(/"/g, ' ')).substr(0,40), 
+					(col3.replace(/"/g, ' ')).substr(0,40), 
+					(col4.replace(/"/g, ' ')).substr(0,30), 
+					(col5.replace(/"/g, ' ')).substr(0,3)));
+   			 }
+		});
+    }
 
 	// This function takes an array of words making the movie name
 	function movieThis(movieName){
