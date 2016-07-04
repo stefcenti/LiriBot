@@ -3,30 +3,34 @@ function liriBot() {
 
 	var fs = require('fs');
 
+	liri(process.argv[2], process.argv.splice(3, process.argv.length - 3));
 
-	switch(process.argv[2]){
-		case "my-tweets":
-			if (process.argv.length != 3) {
-				usage();
+	function liri(appName, argString){
+
+		switch(appName){
+			case "my-tweets":
+				if (argString.length > 0) {
+					usage();
+					break;
+				}
+				myTweets();
 				break;
-			}
-			myTweets();
-			break;
-		case "spotify-this-song":
-			spotifyThis(process.argv.splice(3, process.argv.length - 3));
-			break;
-		case "movie-this":
-			movieThis(process.argv.splice(3, process.argv.length - 3));
-			break;
-		case "do-what-it-says":
-			if (process.argv.length != 3) {
-				usage();
+			case "spotify-this-song":
+				spotifyThis(argString);
 				break;
-			}
-			doIt();
-			break;
-		default:
-			usage();
+			case "movie-this":
+				movieThis(argString);
+				break;
+			case "do-what-it-says":
+				if (argString.length > 0) {
+					usage(appName, argString);
+					break;
+				}
+				doIt();
+				break;
+			default:
+				usage(appName, argString);
+		}
 	}
 
 	function myTweets(){
@@ -65,7 +69,7 @@ function liriBot() {
         var spotify = require('spotify');
         var printf = require('printf');
 
-        var song = songName.length ? songName.join('+'): "Whats+my+age+again";
+        var song = songName.length ? songName : "Whats my age again";
 
         spotify.search({ type: 'track', query: song }, function(err, data) {
 			if ( err ) {
@@ -110,7 +114,7 @@ function liriBot() {
 		// If no movie is specified use Mr. Nobody.  Since each word
 		// of the movie name is separated in the movieName array, it
 		// needs to be joined together with "+" between each word.
-		var movie = movieName.length ? movieName.join('+') : "Mr.+Nobody";
+		var movie = movieName.length ? movieName : "Mr. Nobody";
 
 		request('http://www.omdbapi.com/?t=' + movie + '&y=&plot=short&tomatoes=true&r=json', 
 			function (error, response, body) {
@@ -138,9 +142,26 @@ function liriBot() {
 
 	function doIt(){
 
+    	// We will read the random.txt file
+    	fs.readFile('random.txt', "utf8", function(err, data){
+
+        	// Create an argument object to send to liri
+        	var dataArray = data.split('\n'); // split each line in the file into an array
+
+        	// For each line in the file execute the appropriate command.
+        	// Note that there will be one emp line in the file so use length-1
+//        	for (var i=0; i<dataArray.length-1; i++) {
+        	for (var i=0; i<1; i++) {  // Just do once for now. The calls to 2 apis gets out of sync.
+        		var args = dataArray[i].split(','); // split the line into an array of args
+        		console.log("============== " + args[0] + " " + args[1] + " ==============");
+        		liri(args[0], args[1]);
+        	}
+
+        });
 	}
 
-	function usage(){
+	function usage(appName, argString){
+		console.log("Warning: " + appName + " " + argString);
 		console.log("Usage: node liri.js <command>");
 		console.log("Where: command is one of the following:");
 		console.log("    my-tweets");
