@@ -2,15 +2,15 @@
 function liriBot() {
 
 	var fs = require('fs');
+	var commandLine = true;
 
 	liri(process.argv[2], process.argv.splice(3, process.argv.length - 3));
 
 	function liri(appName, argString){
-
 		switch(appName){
 			case "my-tweets":
 				if (argString.length > 0) {
-					usage();
+					usage(appName, argString);
 					break;
 				}
 				myTweets();
@@ -47,8 +47,13 @@ function liriBot() {
 		});
 
 		var params = {screen_name: 'stefcenti'};
+
 		client.get('statuses/user_timeline', params, function(error, tweets, response){
 			if (!error) {
+				if (!commandLine) {
+					console.log("============== my-tweets ==============");
+				}
+
 				for (var i=0; i<tweets.length && i < 20; i++) {
 					console.log("==========================");
 					console.log("Tweet " + (i+1) + " Created At: " + tweets[i].created_at);
@@ -65,7 +70,6 @@ function liriBot() {
 	}
 
 	function spotifyThis(songName){
-
         var spotify = require('spotify');
         var printf = require('printf');
 
@@ -77,7 +81,9 @@ function liriBot() {
 				return;
 			}
 
-			//console.log(JSON.stringify(data.tracks, null, 2);
+			if (!commandLine) {
+				console.log("============== spotify-this-song " + songName + " ==============");
+			}
 
 			var items = data.tracks.items;
 			var col1 = "";
@@ -107,7 +113,6 @@ function liriBot() {
 
 	// This function takes an array of words making the movie name
 	function movieThis(movieName){
-
 		var request = require('request');
 
 		// Run a request to the OMDB API with the movie specified
@@ -121,6 +126,11 @@ function liriBot() {
 				if (!error && 
 					response.statusCode == 200 &&
 					JSON.parse(body)["Response"] == "True") {
+
+					if (!commandLine) {
+						console.log("============== movie-this " + movieName + " ==============");
+					}
+
 					console.log("Title: " + JSON.parse(body)["Title"]);
 					console.log("Year: " + JSON.parse(body)["Year"]);
 					console.log("IMDB Rating: " + JSON.parse(body)["imdbRating"]);
@@ -142,6 +152,8 @@ function liriBot() {
 
 	function doIt(){
 
+		commandLine = false;
+
     	// We will read the random.txt file
     	fs.readFile('random.txt', "utf8", function(err, data){
 
@@ -150,10 +162,11 @@ function liriBot() {
 
         	// For each line in the file execute the appropriate command.
         	// Note that there will be one emp line in the file so use length-1
-//        	for (var i=0; i<dataArray.length-1; i++) {
-        	for (var i=0; i<1; i++) {  // Just do once for now. The calls to 2 apis gets out of sync.
+        	for (var i=0; i<dataArray.length-1; i++) {
+//       	for (var i=0; i<1; i++) {  // Just do once for now. The calls to 2 apis gets out of sync.
         		var args = dataArray[i].split(','); // split the line into an array of args
-        		console.log("============== " + args[0] + " " + args[1] + " ==============");
+console.log(args);
+				if (args.length == 1) args.push("");
         		liri(args[0], args[1]);
         	}
 
