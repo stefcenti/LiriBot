@@ -1,7 +1,27 @@
 // Includes the FS package for reading and writing files 
 function liriBot() {
 
-	var fs = require('fs');
+	// Set up logging to the console and to a file
+var util = require('util');
+var fs = require('fs');
+
+// Use the 'a' flag to append to the file instead of overwrite it.
+var ws = fs.createWriteStream('./log.txt', {flags: 'a'});
+var through = require('through2');
+
+// Create through stream.
+var t = new through();
+
+// Pipe its data to both stdout and our file write stream.
+t.pipe(process.stdout);
+t.pipe(ws);
+
+// Monkey patch the console.log function to write to our through
+// stream instead of stdout like default.
+console.log = function () {
+  t.write(util.format.apply(this, arguments) + '\n');
+};
+//	var fs = require('fs');
 	var commandLine = true;
 
 	liri(process.argv[2], process.argv.splice(3, process.argv.length - 3));
@@ -165,7 +185,6 @@ function liriBot() {
         	for (var i=0; i<dataArray.length-1; i++) {
 //       	for (var i=0; i<1; i++) {  // Just do once for now. The calls to 2 apis gets out of sync.
         		var args = dataArray[i].split(','); // split the line into an array of args
-console.log(args);
 				if (args.length == 1) args.push("");
         		liri(args[0], args[1]);
         	}
